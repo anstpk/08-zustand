@@ -6,25 +6,24 @@ import { createNote } from '@/lib/api';
 import { useNoteStore } from '@/lib/store/noteStore';
 import css from './NoteForm.module.css';
 
-const TAGS = ['Todo', 'Work', 'Personal', 'Home', 'Study'];
+// Оновлений список тегів згідно з ТЗ
+const TAGS = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
 
 export default function NoteForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
   
-  // Zustand store
   const { draft, setDraft, clearDraft } = useNoteStore();
 
   const mutation = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
-      clearDraft(); // Очищуємо чернетку після успіху
+      clearDraft();
       router.back();
     },
   });
 
-  // Обробка змін (автозбереження в Zustand)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setDraft({ [name]: value });
@@ -42,6 +41,7 @@ export default function NoteForm() {
           <label htmlFor="title">Title</label>
           <input
             name="title"
+            id="title"
             value={draft.title}
             onChange={handleChange}
             className={css.input}
@@ -53,6 +53,7 @@ export default function NoteForm() {
           <label htmlFor="content">Content</label>
           <textarea
             name="content"
+            id="content"
             value={draft.content}
             onChange={handleChange}
             className={css.textarea}
@@ -63,11 +64,13 @@ export default function NoteForm() {
           <label htmlFor="tag">Tag</label>
           <select
             name="tag"
+            id="tag"
             value={draft.tag}
             onChange={handleChange}
             className={css.select}
             required
           >
+            {/* Рендеримо оновлені теги */}
             {TAGS.map((tag) => (
               <option key={tag} value={tag}>{tag}</option>
             ))}
